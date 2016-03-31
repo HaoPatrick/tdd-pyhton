@@ -20,4 +20,5 @@ urlpatterns = [
     #url(r'^admin/', admin.site.urls),
     url(r'^$',lists.views.home_page,name='/'),
     url(r'^list/the-only-list-in-the-world/$',lists.views.view_list,name='view_list'),
+    url(r'^list/new$',lists.views.new_list,name='new_list'),
 ]

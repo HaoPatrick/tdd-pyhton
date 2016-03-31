@@ -6,6 +6,36 @@ from django.template.loader import render_to_string
 from lists.models import Item
 # Create your tests here.
 
+class NewListTest(TestCase):
+
+    def test_save_a_POST_request(self):
+        self.client.post(
+                '/list/new',
+                data={'item_text':'A new list item'})
+        self.assertEqual(Item.objects.count(),1)
+        new_item=Item.objects.first()
+        self.assertEqual(new_item.text,'A new list item')
+
+    def test_redirect_after_POST(self):
+        response=self.client.post(
+                '/list/new',
+                data={'item_text':'A new list item'}
+                )
+        self.assertEqual(response.status_code,302)
+        self.assertEqual(response['location'],'/list/the-only-list-in-the-world/')
+
+    def test_home_page_save_a_post(self):
+        request=HttpRequest()
+        request.method='POST'
+        request.POST['item_text']='A new list item'
+
+        response=home_page(request)
+        #self.assertIn('A new list item',response.content.decode())
+        excepted_html=render_to_string(
+                'home.html',
+                {'new_item_text':'A new list item'}
+                )
+
 class ItemModelTest(TestCase):
 
     def test_saving_and_retriving_items(self):
@@ -55,17 +85,6 @@ class HomePageTest(TestCase):
         excepted_html=render_to_string('home.html')
         self.assertEqual(response.content.decode(),excepted_html)
     '''
-    def test_home_page_save_a_post(self):
-        request=HttpRequest()
-        request.method='POST'
-        request.POST['item_text']='A new list item'
-
-        response=home_page(request)
-        #self.assertIn('A new list item',response.content.decode())
-        excepted_html=render_to_string(
-                'home.html',
-                {'new_item_text':'A new list item'}
-                )
     def test_home_page_can_list_all_items(self):
         Item.objects.create(text='first list')
         Item.objects.create(text='Second list')
