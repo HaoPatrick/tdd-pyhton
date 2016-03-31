@@ -1,6 +1,6 @@
 from django.test import TestCase
 from django.core.urlresolvers import resolve
-from lists.views import home_page
+from lists.views import home_page,view_list
 from django.http import HttpRequest
 from django.template.loader import render_to_string
 from lists.models import Item
@@ -35,7 +35,7 @@ class ItemModelTest(TestCase):
                 'home.html',
                 {'new_item_text': 'A new list item'})
 
-    def test_home_page_can_redirect(self):
+    '''def test_home_page_can_redirect(self):
         request=HttpRequest()
         request.method='POST'
         request.POST['item_text']='A new list item'
@@ -44,7 +44,7 @@ class ItemModelTest(TestCase):
 
         self.assertEqual(response.status_code,302)
         self.assertEqual(response['location'],'/')
-
+    '''
 class HomePageTest(TestCase):
     def test_root_url_resolves_to_home_page_view(self):
         found=resolve('/')
@@ -71,8 +71,20 @@ class HomePageTest(TestCase):
         Item.objects.create(text='Second list')
 
         request=HttpRequest()
-        response=home_page(request)
+        response=view_list(request)
 
         self.assertIn('first list',response.content.decode())
         self.assertIn('Second list',response.content.decode())
 
+class list_view_test(TestCase):
+    def test_display_all_items(self):
+        Item.objects.create(text='item 1')
+        Item.objects.create(text='item 2')
+
+        response=self.client.get('/list/the-only-list-in-the-world/')
+
+        self.assertContains(response,'item 1')
+        self.assertContains(response,'item 2')
+    def test_uses_list_templates(self):
+        response=self.client.get('/list/the-only-list-in-the-world/')
+        self.assertTemplateUsed(response,'list.html')
