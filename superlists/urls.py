@@ -19,6 +19,8 @@ import lists.views
 urlpatterns = [
     #url(r'^admin/', admin.site.urls),
     url(r'^$',lists.views.home_page,name='/'),
-    url(r'^list/the-only-list-in-the-world/$',lists.views.view_list,name='view_list'),
+    #url(r'^list/the-only-list-in-the-world/$',lists.views.view_list,name='view_list'),
+    url(r'^list/(\d+)/$',lists.views.view_list,name='view_list'),
+    url(r'^list/(\d+)/add_item$',lists.views.add_item,name='add_item'),
     url(r'^list/new$',lists.views.new_list,name='new_list'),
 ]
