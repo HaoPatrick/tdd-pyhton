@@ -3,7 +3,7 @@ from django.core.urlresolvers import resolve
 from lists.views import home_page,view_list
 from django.http import HttpRequest
 from django.template.loader import render_to_string
-from lists.models import Item
+from lists.models import Item,List
 # Create your tests here.
 
 class NewListTest(TestCase):
@@ -36,11 +36,17 @@ class NewListTest(TestCase):
                 {'new_item_text':'A new list item'}
                 )
 
-class ItemModelTest(TestCase):
+class ListAndItemModelsTest(TestCase):
 
     def test_saving_and_retriving_items(self):
-        first_item=Item.objects.create(text='The first (ever) list item')
-        second_item=Item.objects.create(text='The second list item')
+        list_=List()
+        list_.save()
+
+        first_item=Item.objects.create(text='The first (ever) list item',list=list_)
+        second_item=Item.objects.create(text='The second list item',list=list_)
+
+        saved_list=List.objects.first()
+        self.assertEqual(saved_list,list_)
 
         saved_items=Item.objects.all()
         self.assertEqual(saved_items.count(),2)
@@ -48,7 +54,10 @@ class ItemModelTest(TestCase):
         first_saved_item=saved_items[0]
         second_saved_item=saved_items[1]
         self.assertEqual(first_saved_item.text,'The first (ever) list item')
+        self.assertEqual(first_saved_item.list,list_)
+        self.assertEqual(second_saved_item.list,list_)
         self.assertEqual(second_saved_item.text,'The second list item')
+
     def test_home_page_can_save_a_Post_request(self):
         request=HttpRequest()
         request.method='POST'
@@ -86,8 +95,9 @@ class HomePageTest(TestCase):
         self.assertEqual(response.content.decode(),excepted_html)
     '''
     def test_home_page_can_list_all_items(self):
-        Item.objects.create(text='first list')
-        Item.objects.create(text='Second list')
+        list_=List.objects.create()
+        Item.objects.create(text='first list',list=list_)
+        Item.objects.create(text='Second list',list=list_)
 
         request=HttpRequest()
         response=view_list(request)
@@ -97,8 +107,9 @@ class HomePageTest(TestCase):
 
 class list_view_test(TestCase):
     def test_display_all_items(self):
-        Item.objects.create(text='item 1')
-        Item.objects.create(text='item 2')
+        list_=List.objects.create()
+        Item.objects.create(text='item 1',list=list_)
+        Item.objects.create(text='item 2',list=list_)
 
         response=self.client.get('/list/the-only-list-in-the-world/')
 
