@@ -157,3 +157,5 @@ class list_view_test(TestCase):
         self.assertEqual(response.context['list'],correct_list)
 
 
+
+
