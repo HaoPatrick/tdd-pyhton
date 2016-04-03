@@ -1,4 +1,5 @@
 from selenium import webdriver
+from unittest import skip
 import unittest
 from django.test import LiveServerTestCase
 from selenium.webdriver.common.keys import Keys
@@ -55,7 +56,9 @@ class NewVisitorTest(LiveServerTestCase):
         self.assertNotEqual(francis_list_url,edith_list_url)
 
         self.fail('Finish the test')'''
-
+    @skip
+    def test_cannot_add_empty_list_items(self):
+        self.fail('wirte me')
 
 
 if __name__=='__main__':
