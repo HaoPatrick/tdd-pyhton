@@ -8,6 +8,18 @@ from lists.models import Item,List
 
 class NewListTest(TestCase):
 
+    def test_validation_errors_are_sent_back_to_home_page_template(self):
+        response=self.client.post('/list/new',data={'item_text':''})
+        self.assertEqual(response.status_code,200)
+        self.assertTemplateUsed(response,'home.html')
+        excepted_error="You can&#39;t have an empty list item"
+        #print(response.content.decode())
+        self.assertContains(response,excepted_error)
+    def test_invalid_list_items_arent_saved(self):
+        self.client.post('/list/new',data={'item_text':''})
+        self.assertEqual(List.objects.count(),0)
+        self.assertEqual(Item.objects.count(),0)
+
     def test_can_save_a_POST_to_an_existing_list(self):
         other_list=List.objects.create()
         correct_list=List.objects.create()

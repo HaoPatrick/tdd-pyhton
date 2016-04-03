@@ -1,4 +1,5 @@
 from django.test import TestCase
+from django.core.exceptions import ValidationError
 from django.core.urlresolvers import resolve
 from lists.views import home_page,view_list
 from django.http import HttpRequest
@@ -54,3 +55,10 @@ class ListAndItemModelsTest(TestCase):
         self.assertEqual(response.status_code,302)
         self.assertEqual(response['location'],'/')
     '''
+
+    def test_cannot_save_empyt_list_items(self):
+        list_=List.objects.create()
+        item=Item(list=list_,text='')
+        with self.assertRaises(ValidationError):
+            item.save()
+            item.full_clean()
